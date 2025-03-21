@@ -1,10 +1,11 @@
 import { ApolloServer } from "@apollo/server";
+import { PubSub } from 'graphql-subscriptions'; // PubSub importu
 import { readFile } from "fs/promises";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import { nanoid } from "nanoid";
-const jsonData = JSON.parse(
-  await readFile(new URL("./data.json", import.meta.url))
-);
+
+const pubSub = new PubSub(); // PubSub instance oluşturuluyor
+const jsonData = JSON.parse(await readFile(new URL("./data.json", import.meta.url)));
 const { users, events, participants, locations } = jsonData;
 
 const typeDefs = `#graphql
@@ -108,6 +109,20 @@ const typeDefs = `#graphql
     locations: [Location!]!
     location(id: ID!): Location 
   }
+  type Subscription {
+    userCreated: User! 
+    userUpdated:User! 
+    userDeleted:User! 
+    eventCreated: Event! 
+    eventUpdated: Event! 
+    eventDeleted: Event! 
+    participantCreated: Participant! 
+    participantUpdated: Participant! 
+    participantDeleted: Participant! 
+    locationCreated: Location! 
+    locationUpdated: Location! 
+    locationDeleted: Location! 
+  }
   type Mutation {
     # Event
     createEvent(data: CreateEventInput!): Event!
@@ -174,17 +189,56 @@ const resolvers = {
       return location;
     },
   },
+  Subscription: {
+    userCreated: {
+      subscribe: () => pubSub.asyncIterator('userCreated'),
+    },
+    userUpdated: {
+      subscribe: () => pubSub.asyncIterator('userUpdated'),
+    },
+    userDeleted: {
+      subscribe: () => pubSub.asyncIterator('userDeleted'),
+    },
+    eventCreated: {
+      subscribe: () => pubSub.asyncIterator('eventCreated'),
+    },
+    eventUpdated: {
+      subscribe: () => pubSub.asyncIterator('eventUpdated'),
+    },
+    eventDeleted: {
+      subscribe: () => pubSub.asyncIterator('eventDeleted'),
+    },
+    participantCreated: {
+      subscribe: () => pubSub.asyncIterator('participantCreated'),
+    },
+    participantUpdated: {
+      subscribe: () => pubSub.asyncIterator('participantUpdated'),
+    },
+    participantDeleted: {
+      subscribe: () => pubSub.asyncIterator('participantDeleted'),
+    },
+    locationCreated: {
+      subscribe: () => pubSub.asyncIterator('locationCreated'),
+    },
+    locationUpdated: {
+      subscribe: () => pubSub.asyncIterator('locationUpdated'),
+    },
+    locationDeleted: {
+      subscribe: () => pubSub.asyncIterator('locationDeleted'),
+    },
+  },
   Mutation: {
     // Event
-    createEvent: (parent, { data }) => {
+    createEvent: (parent, { data },{pubSub}) => {
       const newEvent = {
         id: nanoid(),
         ...data,
       };
       events.push(newEvent);
+      pubSub.publish('eventCreated', { eventCreated: newEvent }); // Subscription yayını
       return newEvent;
     },
-    updateEvent:(parent,{data,id})=>{
+    updateEvent:(parent,{data,id},{pubSub})=>{
       const event = events.find((event) => String(event.id) === id);
       if (!event) {
         throw new Error(`Event with id ${id} not found`);
@@ -194,15 +248,17 @@ const resolvers = {
         ...data,
       };
       events.splice(events.indexOf(event), 1, updatedEvent);
+      pubSub.publish('eventUpdated', { eventUpdated: updatedEvent }); // Subscription yayını
       return updatedEvent;
     },
-    deleteEvent:(parent,{id})=>{
+    deleteEvent:(parent,{id},{pubSub})=>{
       const eventIndex = events.findIndex((event) => String(event.id) === id);
       if (eventIndex === -1) {
         throw new Error(`Event with id ${id} not found`);
       }
       const deletedEvent = events[eventIndex];
       events.splice(eventIndex, 1);
+      pubSub.publish('eventDeleted', { eventDeleted: deletedEvent }); // Subscription yayını
       return deletedEvent;
     },
     deleteAllEvent:(parent,{})=>{
@@ -212,15 +268,16 @@ const resolvers = {
     },
 
     // Participant
-    createParticipant: (parent, { data }) => {
+    createParticipant: (parent, { data },{pubSub}) => {
       const newParticipant = {
         id: nanoid(),
         ...data,
       };
       participants.push(newParticipant);
+      pubSub.publish('participantCreated', { participantCreated: newParticipant }); // Subscription yayını
       return newParticipant;
     },
-    updateParticipant: (parent, { data, id }) => {
+    updateParticipant: (parent, { data, id },{pubSub}) => {
       const participant = participants.find((participant) => String(participant.id) === id);
       if (!participant) {
         throw new Error(`Participant with id ${id} not found`);
@@ -230,15 +287,17 @@ const resolvers = {
         ...data,
       };
       participants.splice(participants.indexOf(participant), 1, updatedParticipant);
+      pubSub.publish('participantUpdated', { participantUpdated: updatedParticipant }); // Subscription yayını
       return updatedParticipant;
     },  
-    deleteParticipant: (parent, { id }) => {
+    deleteParticipant: (parent, { id },{pubSub}) => {
       const participantIndex = participants.findIndex((participant) => String(participant.id) === id);
       if (participantIndex === -1) {
         throw new Error(`Participant with id ${id} not found`);
       }
       const deletedParticipant = participants[participantIndex];
       participants.splice(participantIndex, 1);
+      pubSub.publish('participantDeleted', { participantDeleted: deletedParticipant }); // Subscription yayını
       return deletedParticipant;
     },
     deleteAllParticipant:(parent,{})=>{
@@ -248,15 +307,16 @@ const resolvers = {
     },
 
     // Location
-    createLocation: (parent, { data }) => {
+    createLocation: (parent, { data },{pubSub}) => {
       const newLocation = {
         id: nanoid(),
         ...data,
       };
       locations.push(newLocation);
+      pubSub.publish('locationCreated', { locationCreated: newLocation }); // Subscription yayını
       return newLocation;
     },
-    updateLocation:(parent,{data,id})=>{
+    updateLocation:(parent,{data,id},{pubSub})=>{
       const location = locations.find((location) => String(location.id) === id);
       if (!location) {
         throw new Error(`Location with id ${id} not found`);
@@ -266,15 +326,17 @@ const resolvers = {
         ...data,
       };
       locations.splice(locations.indexOf(location), 1, updatedLocation);
+      pubSub.publish('locationUpdated', { locationUpdated: updatedLocation }); // Subscription yayını
       return updatedLocation;
     },
-    deleteLocation:(parent,{id})=>{
+    deleteLocation:(parent,{id},{pubSub})=>{
       const locationIndex = locations.findIndex((location)=>String(location.id)===id);
       if(locationIndex == -1){
         throw new Error ("Location is Not Found")
       }
       const location = locations[locationIndex];
       locations.splice(locationIndex,1);
+      pubSub.publish('locationDeleted', { locationDeleted: location }); // Subscription yayını
       return location;
     },
     deleteAllLocation:(parent,{})=>{
@@ -284,15 +346,16 @@ const resolvers = {
     },
 
     // User
-    createUser: (parent, { data }) => {
+    createUser: (parent, { data },{pubSub}) => {
       const newUser = {
         id: nanoid(),
         ...data,
       };
       users.push(newUser);
+      pubSub.publish('userCreated', { userCreated: newUser }); // Subscription yayını
       return newUser;
     },
-    updateUser: (parent,{ data, id }) => {
+    updateUser: (parent,{ data, id },{pubSub}) => {
 
       const userIndex = users.findIndex((user) => String(user.id) === id);
       if (userIndex === -1) {
@@ -303,15 +366,17 @@ const resolvers = {
         ...data,
       };
       users.splice(userIndex, 1, updatedUser);
+      pubSub.publish('userUpdated', { userUpdated: updatedUser }); // Subscription yayını
       return updatedUser;
     },
-    deleteUser:(parent,{id})=>{
+    deleteUser:(parent,{id},{pubSub})=>{
       const userIndex = users.findIndex((user)=>String(user.id)===id);
       if(userIndex == -1){
         throw new Error ("User is Not Found")
       }
       const user = users[userIndex];
       users.splice(userIndex,1);
+      pubSub.publish('userDeleted', { userDeleted: user }); // Subscription yayını
       return user;
     },
     deleteAllUsers:(parent,{})=>{

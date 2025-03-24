@@ -32,9 +32,9 @@ const wsServer = new WebSocketServer({
 // Use WebSocket server with GraphQL schema
 useServer({ 
   schema, 
-  context: () => ({ 
+  context: async() => ({ 
     pubSub,
-    jsonData
+    jsonData: JSON.parse(await readFile(new URL("./data.json", import.meta.url)))
   }) 
 }, wsServer);
 
@@ -43,9 +43,9 @@ const apolloServer = new ApolloServer({
   schema,
   introspection: true,
   playground: true,
-  context: ({ req }) => ({ 
+  context: async({ req }) => ({ 
     pubSub,
-    jsonData
+    jsonData: JSON.parse(await readFile(new URL("./data.json", import.meta.url)))
   })
 });
 
@@ -58,9 +58,9 @@ app.use(
   cors(),
   bodyParser.json(),
   expressMiddleware(apolloServer, {
-    context: async ({ req }) => ({ 
+    context: async () => ({ 
       pubSub,
-      jsonData
+      jsonData: JSON.parse(await readFile(new URL("./data.json", import.meta.url)))
     })
   })
 );

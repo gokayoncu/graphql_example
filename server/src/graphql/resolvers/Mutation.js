@@ -1,4 +1,5 @@
 import { nanoid } from 'nanoid';
+
 export const Mutation = {
   // Event
   createEvent: (parent, { data }, { pubSub, jsonData }) => {
@@ -7,7 +8,7 @@ export const Mutation = {
       ...data,
     };
     jsonData.events.push(newEvent);
-    pubSub.publish("eventCreated", { eventCreated: newEvent }); // Subscription yayını
+    pubSub.publish("eventCreated", { eventCreated: newEvent });
     return newEvent;
   },
   updateEvent: (parent, { data, id }, { pubSub, jsonData }) => {
@@ -15,40 +16,32 @@ export const Mutation = {
     if (!event) {
       throw new Error(`Event with id ${id} not found`);
     }
-    const updatedEvent = {
-      ...event,
-      ...data,
-    };
+    const updatedEvent = { ...event, ...data };
     jsonData.events.splice(jsonData.events.indexOf(event), 1, updatedEvent);
-    pubSub.publish("eventUpdated", { eventUpdated: updatedEvent }); // Subscription yayını
+    pubSub.publish("eventUpdated", { eventUpdated: updatedEvent });
     return updatedEvent;
   },
-  deleteEvent: (parent, { id }, { pubSub ,jsonData}) => {
+  deleteEvent: (parent, { id }, { pubSub, jsonData }) => {
     const eventIndex = jsonData.events.findIndex((event) => String(event.id) === id);
     if (eventIndex === -1) {
       throw new Error(`Event with id ${id} not found`);
     }
     const deletedEvent = jsonData.events[eventIndex];
     jsonData.events.splice(eventIndex, 1);
-    pubSub.publish("eventDeleted", { eventDeleted: deletedEvent }); // Subscription yayını
+    pubSub.publish("eventDeleted", { eventDeleted: deletedEvent });
     return deletedEvent;
   },
-  deleteAllEvent: (parent, { jsonData }) => {
+  deleteAllEvent: (parent, args, { jsonData }) => {
     const eventsLength = jsonData.events.length;
     jsonData.events.splice(0, eventsLength);
     return { count: eventsLength };
   },
 
   // Participant
-  createParticipant: (parent, { data }, { pubSub,jsonData }) => {
-    const newParticipant = {
-      id: nanoid(),
-      ...data,
-    };
+  createParticipant: (parent, { data }, { pubSub, jsonData }) => {
+    const newParticipant = { id: nanoid(), ...data };
     jsonData.participants.push(newParticipant);
-    pubSub.publish("participantCreated", {
-      participantCreated: newParticipant,
-    }); // Subscription yayını
+    pubSub.publish("participantCreated", { participantCreated: newParticipant });
     return newParticipant;
   },
   updateParticipant: (parent, { data, id }, { pubSub, jsonData }) => {
@@ -58,21 +51,16 @@ export const Mutation = {
     if (!participant) {
       throw new Error(`Participant with id ${id} not found`);
     }
-    const updatedParticipant = {
-      ...participant,
-      ...data,
-    };
+    const updatedParticipant = { ...participant, ...data };
     jsonData.participants.splice(
       jsonData.participants.indexOf(participant),
       1,
       updatedParticipant
     );
-    pubSub.publish("participantUpdated", {
-      participantUpdated: updatedParticipant,
-    }); // Subscription yayını
+    pubSub.publish("participantUpdated", { participantUpdated: updatedParticipant });
     return updatedParticipant;
   },
-  deleteParticipant: (parent, { id }, { pubSub,jsonData }) => {
+  deleteParticipant: (parent, { id }, { pubSub, jsonData }) => {
     const participantIndex = jsonData.participants.findIndex(
       (participant) => String(participant.id) === id
     );
@@ -81,95 +69,78 @@ export const Mutation = {
     }
     const deletedParticipant = jsonData.participants[participantIndex];
     jsonData.participants.splice(participantIndex, 1);
-    pubSub.publish("participantDeleted", {
-      participantDeleted: deletedParticipant,
-    }); // Subscription yayını
+    pubSub.publish("participantDeleted", { participantDeleted: deletedParticipant });
     return deletedParticipant;
   },
-  deleteAllParticipant: (parent, {jsonData}) => {
+  deleteAllParticipant: (parent, args, { jsonData }) => {
     const participantsLength = jsonData.participants.length;
     jsonData.participants.splice(0, participantsLength);
     return { count: participantsLength };
   },
 
   // Location
-  createLocation: (parent, { data }, { pubSub,jsonData }) => {
-    const newLocation = {
-      id: nanoid(),
-      ...data,
-    };
+  createLocation: (parent, { data }, { pubSub, jsonData }) => {
+    const newLocation = { id: nanoid(), ...data };
     jsonData.locations.push(newLocation);
-    pubSub.publish("locationCreated", { locationCreated: newLocation }); // Subscription yayını
+    pubSub.publish("locationCreated", { locationCreated: newLocation });
     return newLocation;
   },
-  updateLocation: (parent, { data, id }, { pubSub,jsonData }) => {
+  updateLocation: (parent, { data, id }, { pubSub, jsonData }) => {
     const location = jsonData.locations.find((location) => String(location.id) === id);
     if (!location) {
       throw new Error(`Location with id ${id} not found`);
     }
-    const updatedLocation = {
-      ...location,
-      ...data,
-    };
+    const updatedLocation = { ...location, ...data };
     jsonData.locations.splice(jsonData.locations.indexOf(location), 1, updatedLocation);
-    pubSub.publish("locationUpdated", { locationUpdated: updatedLocation }); // Subscription yayını
+    pubSub.publish("locationUpdated", { locationUpdated: updatedLocation });
     return updatedLocation;
   },
-  deleteLocation: (parent, { id }, { pubSub,jsonData }) => {
-    const locationIndex = jsonData.locations.findIndex(
-      (location) => String(location.id) === id
-    );
+  deleteLocation: (parent, { id }, { pubSub, jsonData }) => {
+    const locationIndex = jsonData.locations.findIndex((location) => String(location.id) === id);
     if (locationIndex == -1) {
-      throw new Error("Location is Not Found");
+      throw new Error("Location not found");
     }
     const location = jsonData.locations[locationIndex];
     jsonData.locations.splice(locationIndex, 1);
-    pubSub.publish("locationDeleted", { locationDeleted: location }); // Subscription yayını
+    pubSub.publish("locationDeleted", { locationDeleted: location });
     return location;
   },
-  deleteAllLocation: (parent, {jsonData}) => {
+  deleteAllLocation: (parent, args, { jsonData }) => {
     const locationsLength = jsonData.locations.length;
     jsonData.locations.splice(0, locationsLength);
     return { count: locationsLength };
   },
 
   // User
-  createUser: (parent, { data }, { pubSub,jsonData }) => {
-    console.log(jsonData.users)
-    const newUser = {
-      id: nanoid(),
-      ...data,
-    };
+  createUser: (parent, { data }, { pubSub, jsonData }) => {
+    const newUser = { id: nanoid(), ...data };
     jsonData.users.push(newUser);
-    pubSub.publish("userCreated", { userCreated: newUser }); // Subscription yayını
+    pubSub.publish("userCreated", { userCreated: newUser });
     return newUser;
   },
-  updateUser: (parent, { data, id }, { pubSub,jsonData }) => {
+  updateUser: (parent, { data, id }, { pubSub, jsonData }) => {
     const userIndex = jsonData.users.findIndex((user) => String(user.id) === id);
     if (userIndex === -1) {
       throw new Error(`User with id ${id} not found`);
     }
-    const updatedUser = {
-      ...users[userIndex],
-      ...data,
-    };
+    const updatedUser = { ...jsonData.users[userIndex], ...data };
     jsonData.users.splice(userIndex, 1, updatedUser);
-    pubSub.publish("userUpdated", { userUpdated: updatedUser }); // Subscription yayını
+    pubSub.publish("userUpdated", { userUpdated: updatedUser });
     return updatedUser;
   },
-  deleteUser: (parent, { id }, { pubSub ,jsonData }) => {
+  deleteUser: (parent, { id }, { pubSub, jsonData }) => {
     const userIndex = jsonData.users.findIndex((user) => String(user.id) === id);
     if (userIndex == -1) {
-      throw new Error("User is Not Found");
+      throw new Error("User not found");
     }
     const user = jsonData.users[userIndex];
     jsonData.users.splice(userIndex, 1);
-    pubSub.publish("userDeleted", { userDeleted: user }); // Subscription yayını
+    pubSub.publish("userDeleted", { userDeleted: user });
     return user;
   },
-  deleteAllUsers: (parent, {jsonData}) => {
+  deleteAllUsers: (parent, args, { jsonData }) => {
     const usersLength = jsonData.users.length;
-    users.splice(0, usersLength);
+    jsonData.users.splice(0, usersLength);
     return { count: usersLength };
   },
 };

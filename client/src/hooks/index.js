@@ -14,7 +14,14 @@ export const getListData = (value, events) => {
     })
     .map((event) => ({
       type: "success",
-      content: `${event.title} (${event.from} - ${event.to})`,
+      id: event.id,
+      title: event.title,
+      from: event.from,
+      to: event.to,
+      date: event.date,
+      desc: event.desc,
+      location_id: event.location_id,
+      user_id: event.user_id,
     }));
 };
 

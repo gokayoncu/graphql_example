@@ -22,13 +22,13 @@ const Navbar = () => {
     {
       key: "1",
       label: (
-        <Link to="/events">Events</Link>
+        <Link to="/">Home</Link>
       ),
     },
     {
       key: "2",
       label: (
-        <Link to="/">Home</Link>
+        <Link to="/events">Events</Link>
       ),
     },
   ];

@@ -5,7 +5,7 @@ import App from './App.jsx'
 import { ApolloProvider } from '@apollo/client';
 import client from './apollo.js';
 import { BrowserRouter } from 'react-router';
-import Navbar from './pages/navBar/index';
+import Navbar from './components/navBar/index.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

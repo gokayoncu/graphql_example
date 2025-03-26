@@ -1,24 +1,40 @@
-import React from "react";
-import { Layout } from "antd";
+import React, { useState, useEffect } from "react";
+import { Layout, Calendar } from "antd";
 import { Content } from "antd/es/layout/layout";
-import { Calendar } from "antd";
 import { useQuery } from "@apollo/client";
 import { GET_EVENTS } from "../../querys/getEvents";
 import { dateCellRender, monthCellRender } from "../../helpers";
-import useStore from "../../store";
+import {  Spin } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
+
 function Events() {
   const { loading, error, data } = useQuery(GET_EVENTS);
-
+  const [calendarMode, setCalendarMode] = useState("year");
+  const [selectedDate, setSelectedDate] = useState(null);
 
   const cellRender = (current, info) => {
-    if (info.type === "date")
-      return dateCellRender(current, data, loading);
+    if (info.type === "date") return dateCellRender(current, data, loading);
     if (info.type === "month")
-      return monthCellRender(current, data, loading);
+      return monthCellRender(
+        current,
+        data,
+        loading,
+        setCalendarMode,
+        setSelectedDate
+      );
     return info.originNode;
   };
-
-  if (loading) return <div>Loading...</div>;
+  
+  if (loading) return (
+    <div style={{ 
+      display: 'flex', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      height: '100vh'
+    }}>
+      <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
+    </div>
+  );
   if (error) return <div>Error: {error.message}</div>;
 
   return (
@@ -34,7 +50,15 @@ function Events() {
           >
             Events Calendar
           </h3>
-          <Calendar cellRender={cellRender} />
+          <Calendar
+            cellRender={cellRender}
+            mode={calendarMode}
+            value={selectedDate}
+            onPanelChange={(value, mode) => {
+              setCalendarMode(mode);
+              setSelectedDate(value);
+            }}
+          />
         </div>
       </Content>
     </Layout>

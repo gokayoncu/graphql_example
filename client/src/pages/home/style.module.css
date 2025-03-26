@@ -1,0 +1,48 @@
+.layout {
+  height: 100vh;
+  background: linear-gradient(135deg, #7c93b6, #e3eaf4);
+}
+
+.header {
+  padding: 20px;
+  text-align: center;
+  color: #fff;
+  font-size: 20px;
+}
+
+.content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 64px); /* Header yüksekliği çıkarıldı */
+}
+
+.card {
+  text-align: center;
+  max-width: 600px;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+.intro {
+  text-align: center;
+  max-width: 600px;
+  padding: 20px;
+}
+
+.features {
+  margin: 20px 0;
+  text-align: left;
+}
+
+.features p {
+  margin: 10px 0;
+  line-height: 1.6;
+}
+
+.features strong {
+  color: #1890ff;
+}
+.button {
+  margin-top: 20px;
+}

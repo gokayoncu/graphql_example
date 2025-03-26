@@ -18,10 +18,10 @@
 }
 
 .notes-month section {
-  background: #1890ff;
+  background: #44bdf0;
   color: #fff;
   line-height: 41px;
-  height: 40px;
+  height: 35px;
   margin-bottom: 7px;
   border-radius: 6px 0 0 6px;
 }
@@ -63,9 +63,29 @@ body {
     display: block;
   }
 }
+@media (max-width: 450px) {
+  .ant-menu-horizontal {
+    display: none;
+  }
+  .hamburger-btn {
+    display: block;
+  }
+  .content{
+    margin: 0;
+    padding: 24px 5px;
+  }
+}
 
 @media (min-width: 769px) {
   .hamburger-btn {
     display: none;
   }
+}
+
+.ant-picker-content thead{
+  font-size: 20px;
+  text-align: left;
+}
+.ant-picker-calendar.ant-picker-calendar-full .ant-picker-panel .ant-picker-body th {
+  padding-left: 1%;
 }

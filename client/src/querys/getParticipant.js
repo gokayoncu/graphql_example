@@ -14,6 +14,7 @@ export const GET_PARTICIPANTS = gql`
       title
       to
       user_id
+      image
     }
     user {
       id
@@ -38,6 +39,7 @@ export const GET_PARTICIPANT = gql`
       to
       location_id
       user_id
+      image
       location {
         id
         name

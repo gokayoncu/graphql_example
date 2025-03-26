@@ -11,6 +11,7 @@ export const GET_EVENTS = gql`
     title
     to
     user_id
+    image
   }
 }`;
 
@@ -25,6 +26,7 @@ export const GET_EVENT = gql`
       title
       to
       user_id
+      image
       location {
         name
         lng
@@ -36,6 +38,11 @@ export const GET_EVENT = gql`
         id
         event_id
         user_id
+        user {
+          id
+          username
+          email
+        }
       }
       user {
         id

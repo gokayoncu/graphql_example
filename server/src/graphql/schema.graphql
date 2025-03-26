@@ -23,6 +23,7 @@ type Event {
   to: String
   location_id: ID!
   user_id: ID!
+  image: String
   location: Location!
   user: User!
   participants: [Participant!]!
@@ -36,6 +37,7 @@ input CreateEventInput {
   to: String!
   location_id: ID!
   user_id: ID!
+  image: String
 }
 input UpdateEventInput {
   title: String
@@ -45,6 +47,7 @@ input UpdateEventInput {
   to: String
   location_id: ID
   user_id: ID
+  image: String
 }
 
 type Participant {

@@ -2,6 +2,7 @@ import React from 'react';
 import Modal from './components/modal';
 import Home from './pages/home/index';
 import Events from './pages/events/index';
+import Event from './pages/event';
 import useStore from './store';
 import "antd/dist/reset.css";
 import "./index.css";
@@ -15,7 +16,7 @@ const App = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/events" element={<Events />} />
-      <Route path="/event/:id" element={<Events/>} />
+      <Route path="/event/:id" element={<Event/>} />
     </Routes>
     {isModalOpen && <Modal />}
     </>

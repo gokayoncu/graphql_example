@@ -28,6 +28,7 @@ export const GET_LOCATION = gql`
         to
         location_id
         user_id
+        image
         user {
           id
           username

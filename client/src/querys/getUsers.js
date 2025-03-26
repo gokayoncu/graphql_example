@@ -16,6 +16,20 @@ export const GET_USER = gql`
     id
     username
     email
+    events {
+      id
+      title
+      desc
+      date
+      from
+      to
+      image
+      location_id
+      participants {
+        user_id
+        id
+      }
+    }
   }
   }
 `;

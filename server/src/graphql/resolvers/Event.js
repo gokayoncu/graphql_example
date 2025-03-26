@@ -1,6 +1,5 @@
 export const Event = {
   location: (parent, args, context) => {
-    console.log(context.jsonData); // jsonData'nın içerdiğini kontrol edelim
     return context.jsonData.locations.find(
       (location) => String(location.id) === String(parent.location_id)
     );

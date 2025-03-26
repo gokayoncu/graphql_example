@@ -26,7 +26,7 @@ function Modal() {
               <span>
                 Time: {item.from} - {item.to}
               </span>
-              <Link to={`/event/${item.id}`} className={style.button}>View Details</Link>{" "}
+              <Link to={`/event/${item.id}`} className={style.button} onClick={closeModal} >View Details</Link>{" "}
             </div>
           ))}
         </div>

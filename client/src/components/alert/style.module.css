@@ -1,0 +1,6 @@
+.alert{
+    display: flex;
+    position: absolute;
+    top: 10%;
+    right: 5%;
+}

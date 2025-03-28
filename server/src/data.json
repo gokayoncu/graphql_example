@@ -274,6 +274,17 @@
       "location_id": 12,
       "user_id": 12,
       "image": "https://picsum.photos/200/300"
+    },
+    {
+      "id": 26,
+      "title": "The Great Fruit and Animal Festival",
+  "desc": "Join us for a day of imagination where animals and fruits come to life! Watch as our confident blackberry mascot performs alongside the honorable rat orchestra. Don't miss the tangerine turtle dance competition and the raspberry horse riding show. The highlight of the day will be the imaginative duck leading the lemon parade. Come prepared to smile at our cheerful peach performers!",
+      "date": "2025-04-28",
+      "from": "21:27",
+      "to": "23:45",
+      "location_id": 14,
+      "user_id": 12,
+      "image": "https://picsum.photos/200/300"
     }
   ],
   "locations": [

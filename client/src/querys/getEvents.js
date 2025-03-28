@@ -1,8 +1,7 @@
 import { gql } from "@apollo/client";
 
-export const GET_EVENTS = gql`
-  query Events {
-    events {
+const eventFields = gql`
+  fragment EventFragment on Event {
     date
     desc
     from
@@ -13,7 +12,16 @@ export const GET_EVENTS = gql`
     user_id
     image
   }
-}`;
+`;
+
+export const GET_EVENTS = gql`
+  query Events {
+    events {
+      ...EventFragment
+    }
+  }
+  ${eventFields}
+`;
 
 export const GET_EVENT = gql`
   query Event($eventId: ID!) {
@@ -51,4 +59,13 @@ export const GET_EVENT = gql`
       }
     }
   }
+`;
+
+export const GET_EVENT_SUBSCRIPTION = gql`
+  subscription {
+    eventCreated {
+      ...EventFragment
+    }
+  }
+  ${eventFields}
 `;

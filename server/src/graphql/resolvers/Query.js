@@ -7,13 +7,11 @@ export const Query = {
     }
     return user;
   },
-  events: (parent, args, { jsonData }) => jsonData.events,
+  events: (parent, args, { jsonData }) => {
+    return jsonData.events || [];
+  },
   event: (parent, args, { jsonData }) => {
-    const event = jsonData.events.find((event) => String(event.id) === args.id);
-    if (!event) {
-      throw new Error(`Event with id ${args.id} not found`);
-    }
-    return event;
+    return jsonData.events.find(event => String(event.id) === String(args.id));
   },
   participants: (parent, args, { jsonData }) => jsonData.participants,
   participant: (parent, args, { jsonData }) => {

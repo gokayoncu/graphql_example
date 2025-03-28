@@ -7,65 +7,52 @@ import express from 'express';
 import { expressMiddleware } from '@apollo/server/express4';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import { readFile } from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
 import pubSub from './pubSub.js';
 import { Query, Mutation, Subscription, User, Event, Participant, Location } from './graphql/resolvers/index.js';
 
-const jsonData = JSON.parse(await readFile(new URL("./data.json", import.meta.url)));
+// Bellekte JSON verisini sakla
+let jsonData = JSON.parse(await readFile(new URL("./data.json", import.meta.url)));
+
+// GraphQL Schema
 const schema = makeExecutableSchema({
   typeDefs: `${await readFile(new URL("./graphql/schema.graphql", import.meta.url))}`,
   resolvers: { Query, Mutation, Subscription, User, Event, Participant, Location }
 });
 
-// Create Express app
+// Express ve HTTP Server
 const app = express();
-
-// Create HTTP server
 const httpServer = createServer(app);
 
-// Create WebSocket server
+// WebSocket Server
 const wsServer = new WebSocketServer({
   server: httpServer,
   path: '/graphql',
 });
 
-// Use WebSocket server with GraphQL schema
-useServer({ 
-  schema, 
-  context: async() => ({ 
-    pubSub,
-    jsonData: JSON.parse(await readFile(new URL("./data.json", import.meta.url)))
-  }) 
-}, wsServer);
+// Global context fonksiyonu
+const getContext = () => ({ pubSub, jsonData });
 
-// Create Apollo Server
+useServer({ schema, context: getContext }, wsServer);
+
+// Apollo Server
 const apolloServer = new ApolloServer({
   schema,
   introspection: true,
-  playground: true,
-  context: async({ req }) => ({ 
-    pubSub,
-    jsonData: JSON.parse(await readFile(new URL("./data.json", import.meta.url)))
-  })
+  context: getContext
 });
 
-// Start Apollo Server
 await apolloServer.start();
 
-// Apply Apollo middleware to Express app
+// Apollo Middleware
 app.use(
   '/graphql',
   cors(),
   bodyParser.json(),
-  expressMiddleware(apolloServer, {
-    context: async () => ({ 
-      pubSub,
-      jsonData: JSON.parse(await readFile(new URL("./data.json", import.meta.url)))
-    })
-  })
+  expressMiddleware(apolloServer, { context: getContext })
 );
 
-// Start HTTP server
+// HTTP Server başlat
 httpServer.listen(4000, () => {
   console.log('🚀 HTTP Server ready at http://localhost:4000/graphql');
   console.log('🚀 WebSocket Server ready at ws://localhost:4000/graphql');

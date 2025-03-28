@@ -8,12 +8,12 @@ import { BrowserRouter } from 'react-router';
 import Navbar from './components/navBar/index.jsx';
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  <>
     <BrowserRouter>
       <ApolloProvider client={client}>
         <Navbar />
         <App />
       </ApolloProvider>
     </BrowserRouter>
-  </StrictMode>,
+  </>,
 )

@@ -36,6 +36,7 @@
 
 .cards {
   min-height: 150px;
+  min-width: 45%;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -90,6 +91,8 @@ a {
   .modal {
     width: 90%;
   }
+}
+@media (max-width: 1350px) {
   .cards{
     width: 100%;
   }

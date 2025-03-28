@@ -117,13 +117,13 @@ function Event() {
               onClick={() => setIsModalOpen(true)}
               style={{ cursor: "pointer" }}
             >
-              {participants.slice(0, 5).map((participant) => (
+              {participants.slice(0, 3).map((participant) => (
                 <Avatar key={participant?.id} style={{ marginRight: 8 }}>
                   {participant?.user?.username?.[0] || "P"}
                 </Avatar>
               ))}
-              {participants.length > 5 && (
-                <Avatar>+{participants.length - 5}</Avatar>
+              {participants.length > 3 && (
+                <Avatar>+{participants.length - 3}</Avatar>
               )}
             </div>
           ) : (

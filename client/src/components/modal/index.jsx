@@ -14,13 +14,14 @@ function Modal() {
     }
     return title;
   };
+  console.log(data)
   return (
     <div className={style.content}>
       <div className={style.modal}>
       <span className={style.closeButton} onClick={closeModal}>X</span>
-        <div className={style.detail}>
+        <div className={style.detail} style={data.length >2 ? {display: "flex",flexDirection: "column" ,flexWrap: "wrap"} : {}}>
           {data.map((item) => (
-            <div key={item.id} className={style.cards}>
+            <div key={item.id} className={style.cards} style={data.length >2 ? {width:'100%'} : {}}>
               <h3>{renderTitle(item.title)}</h3>
               <span>Date: {item.date}</span>
               <span>

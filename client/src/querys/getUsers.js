@@ -13,23 +13,33 @@ export const GET_USERS = gql`
 export const GET_USER = gql`
   query Query($userId: ID!) {
     user(id: $userId) {
-    id
-    username
-    email
-    events {
       id
-      title
-      desc
-      date
-      from
-      to
-      image
-      location_id
-      participants {
-        user_id
+      username
+      email
+      events {
         id
+        title
+        desc
+        date
+        from
+        to
+        image
+        location_id
+        participants {
+          user_id
+          id
+        }
       }
     }
   }
+`;
+
+export const ADD_USER = gql`
+  mutation Mutation($data: CreateUserInput!) {
+    createUser(data: $data) {
+      id
+      email
+      username
+    }
   }
 `;

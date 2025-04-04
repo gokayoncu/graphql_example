@@ -1,0 +1,38 @@
+.formContainer {
+    max-width: 600px;
+    margin: 20px auto 60px !important;
+    background-color: #f9f9f9;
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: visible; /* overflow-y: auto yerine visible yapmayı deneyin */
+}
+
+.formTitle {
+    margin-bottom: 18px;
+    text-align: center;
+    color: #4A4A4A;
+}
+
+.inputField {
+    border-radius: 4px;
+}
+
+.selectField {
+    border-radius: 4px;
+}
+
+.submitButton {
+    width: 100%;
+    border-radius: 4px;
+    background-color: #1890ff;
+    border-color: #1890ff;
+}
+
+.form {
+    gap: 8px !important;
+}
+
+.customMargin {
+    margin-bottom: 20px; 
+}

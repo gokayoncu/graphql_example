@@ -62,8 +62,24 @@ export const GET_EVENT = gql`
 `;
 
 export const GET_EVENT_SUBSCRIPTION = gql`
-  subscription {
+  subscription Subscription {
     eventCreated {
+      id
+      title
+      desc
+      date
+      from
+      to
+      location_id
+      user_id
+      image
+    }
+  }
+`;
+
+export const CREATE_EVENT = gql`
+  mutation CreateEvent($data: CreateEventInput!) {
+    createEvent(data: $data) {
       ...EventFragment
     }
   }

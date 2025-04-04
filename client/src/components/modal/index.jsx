@@ -14,7 +14,6 @@ function Modal() {
     }
     return title;
   };
-  console.log(data)
   return (
     <div className={style.content}>
       <div className={style.modal}>

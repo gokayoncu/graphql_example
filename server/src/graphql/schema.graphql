@@ -55,7 +55,7 @@ type Participant {
   user_id: ID!
   event_id: ID!
   user: User!
-  event: Event! # Sadece bir event olmalı
+  event: Event!
 }
 
 input CreateParticipantInput {

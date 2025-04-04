@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router";
-import { useQuery } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 import { GET_EVENT } from "../../querys/getEvents.js";
+import { ADD_PARTICIPANT } from "../../querys/getParticipant.js";
+import { SUBSCRIPTION_PARTICIPANTS } from "../../querys/getParticipant.js";
 import {
   Layout,
   Card,
@@ -15,15 +17,59 @@ import {
   List,
 } from "antd";
 import style from "./style.module.css";
+import useStore from "../../store.js";
 
 const { Title, Text } = Typography;
 
 function Event() {
   const { id } = useParams();
-  const { loading, error, data } = useQuery(GET_EVENT, {
+  const { loading, error, data, subscribeToMore } = useQuery(GET_EVENT, {
     variables: { eventId: id },
   });
 
+  useEffect(() => {
+    subscribeToMore({
+      document: SUBSCRIPTION_PARTICIPANTS,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+
+        const newParticipant = subscriptionData.data.participantCreated;
+
+        // Eğer doğru event değilse, hiçbir şey yapma
+        if (newParticipant.event_id !== prev.event.id) {
+          return prev;
+        }
+
+        // Yeni katılımcıyı mevcut listeye ekle
+        return {
+          ...prev,
+          event: {
+            ...prev.event,
+            participants: [...prev.event.participants, newParticipant],
+          },
+        };
+      },
+    });
+  }, [subscribeToMore]);
+
+  const user_id = JSON.parse(localStorage.getItem("userInfo"))?.createUser.id;
+  const [createParticipant] = useMutation(ADD_PARTICIPANT);
+
+  const joinEvent = async (e) => {
+    try {
+      const data = await createParticipant({
+        variables: {
+          data: {
+            event_id: id,
+            user_id: user_id,
+          },
+        },
+      });
+      console.log(data);
+    } catch (error) {
+      console.error("Katılımcı eklenirken hata oluştu:", error);
+    }
+  };
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   if (loading) return <div>Loading...</div>;
@@ -152,15 +198,17 @@ function Event() {
             )}
           />
         </Modal>
-
-        {/* Back Button */}
-        <Button
-          type="primary"
-          onClick={() => window.history.back()}
-          style={{ marginTop: 16 }}
-        >
-          Takvime Dön
-        </Button>
+        <div className={style.buttons}>
+          {" "}
+          <Button
+            type="primary"
+            onClick={() => window.history.back()}
+            style={{ marginTop: 16 }}
+          >
+            Takvime Dön
+          </Button>
+          <Button onClick={joinEvent}>Etkinliğe Katıl</Button>
+        </div>
       </Card>
     </Layout>
   );

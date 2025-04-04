@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Layout, Menu, Button, Drawer } from "antd";
-import { MenuOutlined } from "@ant-design/icons";
+import { Layout, Menu, Button, Drawer, Dropdown, Space } from "antd";
+import { MenuOutlined} from "@ant-design/icons";
 import { Link, useLocation } from "react-router";
+import useStore from "../../store";
+import { profileMenuItem } from "../../helpers";
 const { Header } = Layout;
 
 const Navbar = () => {
   const [visible, setVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const {pathname}= useLocation();
+  const { closeAlert } = useStore();
+  
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -17,6 +21,7 @@ const Navbar = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const user = localStorage.getItem('userInfo');
   const menuItems = [
     {
       key: "1",
@@ -30,12 +35,21 @@ const Navbar = () => {
         <Link to="/events">Events</Link>
       ),
     },
+    {
+      key: user ? "4" : "3",
+      label: (
+        profileMenuItem(user,closeAlert)
+      ),
+    },
   ];
 
+  const pathToKeyMap = {
+    "/": "1",
+    "/events": "2",
+    "/login": "3"
+  };
   const getSelectedKeys = () => {
-    if (pathname === "/") return ["1"];
-    if (pathname === "/events") return ["2"];
-    return ["0"];
+    return [pathToKeyMap[pathname] || "0"];
   };
 
   const showDrawer = () => {

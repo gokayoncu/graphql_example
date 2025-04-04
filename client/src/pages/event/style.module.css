@@ -64,3 +64,11 @@
 .detailItem :global(.ant-typography) {
   margin: 0;
 }
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: end;
+  justify-content: end;
+  gap: 10px;
+}

@@ -43,7 +43,7 @@ export const Mutation = {
     jsonData.participants.push(newParticipant);
     pubSub.publish("participantCreated", { participantCreated: newParticipant });
     return newParticipant;
-  },
+  },  
   updateParticipant: (parent, { data, id }, { pubSub, jsonData }) => {
     const participant = jsonData.participants.find(
       (participant) => String(participant.id) === id

@@ -16,6 +16,7 @@ function Events() {
     subscribeToMore({
       document: GET_EVENT_SUBSCRIPTION,
       updateQuery: (prev, { subscriptionData }) => {
+        console.log("SUB DATA", subscriptionData);
         if (!subscriptionData.data) return prev;
         openAlert();
         return {
@@ -24,7 +25,6 @@ function Events() {
       },
     });
   }, []);
-  console.log(data)
   const cellRender = (current, info) => {
     if (info.type === "date") return dateCellRender(current, data, loading);
     if (info.type === "month")

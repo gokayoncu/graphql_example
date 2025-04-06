@@ -61,7 +61,7 @@ const Navbar = () => {
   };
 
   return (
-    <Layout>
+    <Layout style={{maxHeight: "100%"}}>
     <Header
       style={{
         display: "flex",

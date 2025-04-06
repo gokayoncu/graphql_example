@@ -1,4 +1,11 @@
 export const User = {
-    events: (parent,args,{jsonData}) =>
-      jsonData.events.filter((event) => String(event.user_id) === String(parent.id)),
-  }
+  events: async (parent, args, { _db }) => {
+    try {
+      const events = await _db.Events.find({ user_id: parent.id });
+      return events;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  },
+};

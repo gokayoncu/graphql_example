@@ -7,11 +7,17 @@ import express from 'express';
 import { expressMiddleware } from '@apollo/server/express4';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import { readFile, writeFile } from 'fs/promises';
-import pubSub from './pubSub.js';
+import { readFile } from 'fs/promises';
+import pubSub from './pubSub.js'
 import { Query, Mutation, Subscription, User, Event, Participant, Location } from './graphql/resolvers/index.js';
+import db from './db.js';
+import Users from './models/User.js';
+import Events from './models/Events.js';
+import Locations from './models/Location.js';
+import Participants from './models/Participants.js';
 
-// Bellekte JSON verisini sakla
+db();
+
 let jsonData = JSON.parse(await readFile(new URL("./data.json", import.meta.url)));
 
 // GraphQL Schema
@@ -31,7 +37,16 @@ const wsServer = new WebSocketServer({
 });
 
 // Global context fonksiyonu
-const getContext = () => ({ pubSub, jsonData });
+const getContext = () => ({ 
+  pubSub, 
+  jsonData,
+  _db: {
+    Users,
+    Events,
+    Locations,
+    Participants
+  }
+});
 
 useServer({ schema, context: getContext }, wsServer);
 

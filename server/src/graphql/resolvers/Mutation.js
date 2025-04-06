@@ -2,145 +2,191 @@ import { nanoid } from 'nanoid';
 
 export const Mutation = {
   // Event
-  createEvent: (parent, { data }, { pubSub, jsonData }) => {
-    const newEvent = {
-      id: nanoid(),
-      ...data,
-    };
-    jsonData.events.push(newEvent);
-    pubSub.publish("eventCreated", { eventCreated: newEvent });
+  createEvent: async (parent, { data }, { pubSub, _db }) => {
+    const newEvent = new _db.Events(data);
+    await newEvent.save();
+    pubSub.publish("eventCreated", { 
+      eventCreated: {
+        ...newEvent.toObject(),
+        id: newEvent._id,
+      }
+    });
     return newEvent;
   },
-  updateEvent: (parent, { data, id }, { pubSub, jsonData }) => {
-    const event = jsonData.events.find((event) => String(event.id) === id);
+  updateEvent: async (parent, { data, id }, { pubSub, _db }) => {
+    const event = await _db.Events.findOne({ _id: id });
     if (!event) {
       throw new Error(`Event with id ${id} not found`);
     }
-    const updatedEvent = { ...event, ...data };
-    jsonData.events.splice(jsonData.events.indexOf(event), 1, updatedEvent);
-    pubSub.publish("eventUpdated", { eventUpdated: updatedEvent });
-    return updatedEvent;
+    Object.assign(event, data);
+    await event.save();
+    pubSub.publish("eventUpdated", { 
+      eventUpdated: {
+        ...event.toObject(),
+        id: event._id,
+      }
+    });
+    return event;
   },
-  deleteEvent: (parent, { id }, { pubSub, jsonData }) => {
-    const eventIndex = jsonData.events.findIndex((event) => String(event.id) === id);
-    if (eventIndex === -1) {
+  deleteEvent: async (parent, { id }, { pubSub, _db }) => {
+    const event = await _db.Events.findOneAndDelete({ _id: id });
+    if (!event) {
       throw new Error(`Event with id ${id} not found`);
     }
-    const deletedEvent = jsonData.events[eventIndex];
-    jsonData.events.splice(eventIndex, 1);
-    pubSub.publish("eventDeleted", { eventDeleted: deletedEvent });
-    return deletedEvent;
+    pubSub.publish("eventDeleted", { 
+      eventDeleted: {
+        ...event.toObject(),
+        id: event._id,
+      }
+    });
+    return event;
   },
-  deleteAllEvent: (parent, args, { jsonData }) => {
-    const eventsLength = jsonData.events.length;
-    jsonData.events.splice(0, eventsLength);
+  deleteAllEvent: (parent, args, { _db }) => {
+    const eventsLength = _db.Events.countDocuments();
+    _db.Events.deleteMany({});
     return { count: eventsLength };
   },
 
   // Participant
-  createParticipant: (parent, { data }, { pubSub, jsonData }) => {
-    const newParticipant = { id: nanoid(), ...data };
-    jsonData.participants.push(newParticipant);
-    pubSub.publish("participantCreated", { participantCreated: newParticipant });
+  createParticipant: async (parent, { data }, { pubSub, _db }) => {
+    const newParticipant = new _db.Participants(data);
+    await newParticipant.save();
+    pubSub.publish("participantCreated", {
+      participantCreated: {
+        user_id: newParticipant.user_id,
+        event_id: newParticipant.event_id,
+        id: newParticipant._id
+      }
+    });
     return newParticipant;
-  },  
-  updateParticipant: (parent, { data, id }, { pubSub, jsonData }) => {
-    const participant = jsonData.participants.find(
-      (participant) => String(participant.id) === id
-    );
+  },
+  updateParticipant: async (parent, { data, id }, { pubSub, _db }) => {
+    const participant = await _db.Participants.findOne({ _id: id });
     if (!participant) {
       throw new Error(`Participant with id ${id} not found`);
     }
-    const updatedParticipant = { ...participant, ...data };
-    jsonData.participants.splice(
-      jsonData.participants.indexOf(participant),
-      1,
-      updatedParticipant
-    );
-    pubSub.publish("participantUpdated", { participantUpdated: updatedParticipant });
-    return updatedParticipant;
+    Object.assign(participant, data);
+    await participant.save();
+    pubSub.publish("participantUpdated", { 
+      participantUpdated: {
+        ...participant.toObject(),
+        id: participant._id,
+        user_id: participant.user_id,
+        event_id: participant.event_id,
+      }
+    });
+    return participant;
   },
-  deleteParticipant: (parent, { id }, { pubSub, jsonData }) => {
-    const participantIndex = jsonData.participants.findIndex(
-      (participant) => String(participant.id) === id
-    );
-    if (participantIndex === -1) {
+  deleteParticipant: async (parent, { id }, { pubSub, _db }) => {
+    const participant = await _db.Participants.findOneAndDelete({ _id: id });
+    if (!participant) {
       throw new Error(`Participant with id ${id} not found`);
     }
-    const deletedParticipant = jsonData.participants[participantIndex];
-    jsonData.participants.splice(participantIndex, 1);
-    pubSub.publish("participantDeleted", { participantDeleted: deletedParticipant });
-    return deletedParticipant;
+    pubSub.publish("participantDeleted", { 
+      participantDeleted: {
+        ...participant.toObject(),
+        id: participant._id,
+        user_id: participant.user_id,
+        event_id: participant.event_id,
+      }
+    });
+    return participant;
   },
-  deleteAllParticipant: (parent, args, { jsonData }) => {
-    const participantsLength = jsonData.participants.length;
-    jsonData.participants.splice(0, participantsLength);
+  deleteAllParticipant: (parent, args, { _db }) => {
+    const participantsLength = _db.Participants.countDocuments();
+    _db.Participants.deleteMany({});
     return { count: participantsLength };
   },
 
   // Location
-  createLocation: (parent, { data }, { pubSub, jsonData }) => {
-    const newLocation = { id: nanoid(), ...data };
-    jsonData.locations.push(newLocation);
-    pubSub.publish("locationCreated", { locationCreated: newLocation });
+  createLocation: async (parent, { data }, { pubSub, _db }) => {
+    const newLocation = new _db.Locations(data);
+    await newLocation.save();
+    pubSub.publish("locationCreated", { 
+      locationCreated: {
+        ...newLocation.toObject(),
+        id: newLocation._id,
+      }
+    });
     return newLocation;
   },
-  updateLocation: (parent, { data, id }, { pubSub, jsonData }) => {
-    const location = jsonData.locations.find((location) => String(location.id) === id);
+  updateLocation: async (parent, { data, id }, { pubSub, _db }) => {
+    const location = await _db.Locations.findOne({ _id: id });
     if (!location) {
       throw new Error(`Location with id ${id} not found`);
     }
-    const updatedLocation = { ...location, ...data };
-    jsonData.locations.splice(jsonData.locations.indexOf(location), 1, updatedLocation);
-    pubSub.publish("locationUpdated", { locationUpdated: updatedLocation });
-    return updatedLocation;
-  },
-  deleteLocation: (parent, { id }, { pubSub, jsonData }) => {
-    const locationIndex = jsonData.locations.findIndex((location) => String(location.id) === id);
-    if (locationIndex == -1) {
-      throw new Error("Location not found");
-    }
-    const location = jsonData.locations[locationIndex];
-    jsonData.locations.splice(locationIndex, 1);
-    pubSub.publish("locationDeleted", { locationDeleted: location });
+    Object.assign(location, data);
+    await location.save();
+    pubSub.publish("locationUpdated", { 
+      locationUpdated: {
+        ...location.toObject(),
+        id: location._id,
+      }
+    });
     return location;
   },
-  deleteAllLocation: (parent, args, { jsonData }) => {
-    const locationsLength = jsonData.locations.length;
-    jsonData.locations.splice(0, locationsLength);
+  deleteLocation: async (parent, { id }, { pubSub, _db }) => {
+    const location = await _db.Locations.findOneAndDelete({ _id: id });
+    if (!location) {
+      throw new Error(`Location with id ${id} not found`);
+    }
+    pubSub.publish("locationDeleted", { 
+      locationDeleted: {
+        ...location.toObject(),
+        id: location._id,
+      }
+    });
+    return location;
+  },
+  deleteAllLocation: (parent, args, { _db }) => {
+    const locationsLength = _db.Locations.countDocuments();
+    _db.Locations.deleteMany({});
     return { count: locationsLength };
   },
 
   // User
-  createUser: (parent, { data }, { pubSub, jsonData }) => {
-    const newUser = { id: nanoid(), ...data };
-    jsonData.users.push(newUser);
-    pubSub.publish("userCreated", { userCreated: newUser });
+  createUser: async (parent, { data }, { pubSub, _db }) => {
+    const newUser = new _db.Users(data);
+    await newUser.save();
+    pubSub.publish("userCreated", { 
+      userCreated: {
+        ...newUser.toObject(),
+        id: newUser._id,
+      }
+    });
     return newUser;
   },
-  updateUser: (parent, { data, id }, { pubSub, jsonData }) => {
-    const userIndex = jsonData.users.findIndex((user) => String(user.id) === id);
-    if (userIndex === -1) {
+  updateUser: async (parent, { data, id }, { pubSub, _db }) => {
+    const user = await _db.Users.findOne({ _id: id });
+    if (!user) {
       throw new Error(`User with id ${id} not found`);
     }
-    const updatedUser = { ...jsonData.users[userIndex], ...data };
-    jsonData.users.splice(userIndex, 1, updatedUser);
-    pubSub.publish("userUpdated", { userUpdated: updatedUser });
-    return updatedUser;
-  },
-  deleteUser: (parent, { id }, { pubSub, jsonData }) => {
-    const userIndex = jsonData.users.findIndex((user) => String(user.id) === id);
-    if (userIndex == -1) {
-      throw new Error("User not found");
-    }
-    const user = jsonData.users[userIndex];
-    jsonData.users.splice(userIndex, 1);
-    pubSub.publish("userDeleted", { userDeleted: user });
+    Object.assign(user, data);
+    await user.save();
+    pubSub.publish("userUpdated", { 
+      userUpdated: {
+        ...user.toObject(),
+        id: user._id,
+      }
+    });
     return user;
   },
-  deleteAllUsers: (parent, args, { jsonData }) => {
-    const usersLength = jsonData.users.length;
-    jsonData.users.splice(0, usersLength);
+  deleteUser: async (parent, { id }, { pubSub, _db }) => {
+    const user = await _db.Users.findOneAndDelete({ _id: id });
+    if (!user) {
+      throw new Error(`User with id ${id} not found`);
+    }
+    pubSub.publish("userDeleted", { 
+      userDeleted: {
+        ...user.toObject(),
+        id: user._id,
+      }
+    });
+    return user;
+  },
+  deleteAllUsers: (parent, args, { _db }) => {
+    const usersLength = _db.Users.countDocuments();
+    _db.Users.deleteMany({});
     return { count: usersLength };
   },
 };

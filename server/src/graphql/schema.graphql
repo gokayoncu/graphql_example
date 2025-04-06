@@ -1,7 +1,7 @@
 type User {
   id: ID
-  username: String
-  email: String
+  username: String!
+  email: String!
   events: [Event!]
 }
 

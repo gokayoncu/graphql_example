@@ -26,6 +26,7 @@ function Event() {
   const { loading, error, data, subscribeToMore } = useQuery(GET_EVENT, {
     variables: { eventId: id },
   });
+  const {getAlertData, openAlert} = useStore();
 
   useEffect(() => {
     subscribeToMore({
@@ -35,12 +36,10 @@ function Event() {
 
         const newParticipant = subscriptionData.data.participantCreated;
 
-        // Eğer doğru event değilse, hiçbir şey yapma
         if (newParticipant.event_id !== prev.event.id) {
           return prev;
         }
 
-        // Yeni katılımcıyı mevcut listeye ekle
         return {
           ...prev,
           event: {
@@ -55,9 +54,9 @@ function Event() {
   const user_id = JSON.parse(localStorage.getItem("userInfo"))?.createUser.id;
   const [createParticipant] = useMutation(ADD_PARTICIPANT);
 
-  const joinEvent = async (e) => {
+  const joinEvent = async () => {
     try {
-      const data = await createParticipant({
+      await createParticipant({
         variables: {
           data: {
             event_id: id,
@@ -65,7 +64,8 @@ function Event() {
           },
         },
       });
-      console.log(data);
+      getAlertData({ type: "success", message: "Event joined successfully!" });
+      openAlert();
     } catch (error) {
       console.error("Katılımcı eklenirken hata oluştu:", error);
     }

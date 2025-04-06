@@ -5,16 +5,17 @@ import { CREATE_EVENT } from "../../querys/getEvents";
 import { GET_LOCATIONS } from "../../querys/getLocation";
 import { useNavigate } from "react-router";
 import style from './style.module.css';
+import useStore from '../../store.js';
 const { Option } = Select;
 
 function CreateEvents() {
   const [form] = Form.useForm();
   const [createEvent] = useMutation(CREATE_EVENT);
-  const { error, data } = useQuery(GET_LOCATIONS);
+  const { data } = useQuery(GET_LOCATIONS);
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
+  const { openAlert,getAlertData } = useStore();
   useEffect(() => {
     if (data) {
       setLocations(data.locations);
@@ -24,7 +25,7 @@ function CreateEvents() {
   const onFinish = async (values) => {
     try {
       setLoading(true);
-      const user = JSON.parse(localStorage.getItem("userInfo"));
+      const user = JSON.parse(localStorage.getItem("userInfo")).createUser;
       const formattedDate = values.date
         ? values.date.format("YYYY-MM-DD")
         : null;
@@ -48,19 +49,14 @@ function CreateEvents() {
 
       message.success("Event created successfully!");
       form.resetFields();
+      getAlertData({ type: "success", message: "Event created successfully!" });
+      openAlert();
       navigate("/events");
     } catch (error) {
       message.error(error.message);
     } finally {
       setLoading(false);
     }
-  };
-
-  const normFile = (e) => {
-    if (Array.isArray(e)) {
-      return e;
-    }
-    return e?.fileList;
   };
 
   return (

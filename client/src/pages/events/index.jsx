@@ -6,25 +6,48 @@ import { GET_EVENTS, GET_EVENT_SUBSCRIPTION } from "../../querys/getEvents";
 import { dateCellRender, monthCellRender } from "../../helpers";
 import { Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
-import useStore from "../../store";
+
 function Events() {
-  const { loading, error, data, subscribeToMore } = useQuery(GET_EVENTS);
+  
+  const { loading, error, data, subscribeToMore } = useQuery(GET_EVENTS, {
+    fetchPolicy: 'cache-and-network'
+  });
   const [calendarMode, setCalendarMode] = useState("year");
   const [selectedDate, setSelectedDate] = useState(null);
-  const { openAlert } = useStore();
+
   useEffect(() => {
-    subscribeToMore({
+    const unsubscribe = subscribeToMore({
       document: GET_EVENT_SUBSCRIPTION,
       updateQuery: (prev, { subscriptionData }) => {
-        console.log("SUB DATA", subscriptionData);
-        if (!subscriptionData.data) return prev;
-        openAlert();
+        console.log("Subscription verisi geldi:", subscriptionData);
+
+        if (!subscriptionData.data?.eventCreated) {
+          console.warn("Subscription verisi boş");
+          return prev;
+        }
+
+        const newEvent = subscriptionData.data.eventCreated;
+
+        // Eğer event zaten listede varsa ekleme
+        if (prev.events.some((event) => event.id === newEvent.id)) {
+          console.log("Event zaten mevcut:", newEvent.id);
+          return prev;
+        }
+
+        console.log("Yeni event eklendi:", newEvent);
         return {
-          events: [...prev.events, subscriptionData.data.eventCreated],
+          ...prev,
+          events: [newEvent, ...prev.events], // Yeni eventi başa ekle
         };
       },
+      onError: (err) => {
+        console.error("Subscription hatası:", err);
+      },
     });
-  }, []);
+
+    return () => unsubscribe();
+  }, [subscribeToMore]);
+
   const cellRender = (current, info) => {
     if (info.type === "date") return dateCellRender(current, data, loading);
     if (info.type === "month")
@@ -67,6 +90,7 @@ function Events() {
             Events Calendar
           </h3>
           <Calendar
+            key={data?.events?.length} // events dizisi değiştiğinde yeniden render
             cellRender={cellRender}
             mode={calendarMode}
             value={selectedDate}

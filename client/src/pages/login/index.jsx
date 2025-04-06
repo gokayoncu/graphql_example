@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { Button, Form, Input, message, Typography } from "antd";
+import React from "react";
+import { Button, Form, Input, Typography } from "antd";
 import { UserOutlined, MailOutlined } from "@ant-design/icons";
 import styles from "./style.module.css";
 import { useNavigate } from "react-router";
 import useStore from "../../store";
-import { useQuery, useMutation } from "@apollo/client";
+import {  useMutation } from "@apollo/client";
 import { ADD_USER } from "../../querys/getUsers";
 const { Title } = Typography;
 
@@ -14,6 +14,7 @@ function Login() {
   const [createUser] = useMutation(ADD_USER);
   const { getAlertData, openAlert } = useStore();
   const { addUsers } = useStore();
+  
   const onFinish = async(values) => {
     const user =await createUser({
       variables: {

@@ -1,22 +1,42 @@
+import mongoose from "mongoose";
+
 export const Event = {
-  location: (parent, args, context) => {
-    return context.jsonData.locations.find(
-      (location) => String(location.id) === String(parent.location_id)
-    );
+  id: (parent) => {
+    if (parent.id) {
+      return parent.id;
+    }
+    return parent.id;
   },
-  user: (parent, args, context) => {
-    return context.jsonData.users.find(
-      (user) => String(user.id) === String(parent.user_id)
-    );
+  location: async (parent, args, context) => {
+    const location = await context._db.Locations.findOne({
+      _id: new mongoose.Types.ObjectId(parent.location_id)
+    });
+    if (!location) {
+      throw new Error("Location with id " + parent.location_id + " not found");
+    }
+    return location;
   },
-  participants: (parent, args, context) => {
-    return context.jsonData.participants
-      .filter((participant) => String(participant.event_id) === String(parent.id))
-      .map((participant) => ({
-        ...participant,
-        user: context.jsonData.users.find(
-          (user) => String(user.id) === String(participant.user_id)
-        ),
-      }));
+  user: async (parent, args, context) => {
+    const user = await context._db.Users.findOne({
+      _id: new mongoose.Types.ObjectId(parent.user_id)
+    });
+    if (!user) {
+      throw new Error(`User with id ${parent.user_id} not found`);
+    }
+    return user;
   },
+participants: async (parent, args, { _db }) => {
+  const participants = await _db.Participants.find({
+    event_id: parent.id
+  }).populate('user_id');
+  
+  return participants
+    .filter(participant => participant.user_id) // null olan kullanıcıları filtrele
+    .map(participant => ({
+      ...participant.toObject(),
+      id: participant._id.toString(),
+      user_id: participant.user_id._id.toString(),
+      event_id: participant.event_id.toString()
+    }));
+  }
 };
